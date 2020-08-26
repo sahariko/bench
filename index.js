@@ -20,10 +20,14 @@ const bigintToNumber = (bigint) => Number(bigint.toString());
 /**
  * Measures a single function's average execution time, in nanoseconds accuracy.
  * @param {Function} fn The function to measure.
- * @param {Number} iterations The number of iterations to run.
- * @returns {Object<Number>}
+ * @param {Number} options.iterations The number of iterations to run. Higher iterations account for engine warm up and parsing. Default is 100000.
+ * @param {String} options.stat The statistical method to use when looking on the execution result. Can be either "median" or "average". Default is "median".
+ * @returns {Number}
  */
-const measureCase = (fn, iterations = DEFAULTS.iterations) => {
+const measureCase = (fn, {
+    iterations = DEFAULTS.iterations,
+    stat = DEFAULTS.stat
+} = {}) => {
     let total = BigInt(0);
     let median;
     const medianIndex = Math.floor(iterations / 2);
@@ -38,13 +42,11 @@ const measureCase = (fn, iterations = DEFAULTS.iterations) => {
 
         if (i === medianIndex) {
             median = time;
+            break;
         }
     }
 
-    return {
-        average: bigintToNumber(total) / iterations,
-        median
-    };
+    return stat === STAT_METHODS.median ? median : bigintToNumber(total) / iterations;
 };
 
 /**
@@ -111,8 +113,8 @@ const validateArgs = ({ cases, stat, iterations }) => {
 /**
  * Compares several functions' execution time, and prints the results to the console.
  * @param {Function[]} cases The different cases to compare.
- * @param {Number} options.iterations The number of iterations to run. Higher iterations account for engine warm up and parsing.
- * @param {String} options.stat The statistical method to use when looking on the execution result.
+ * @param {Number} options.iterations The number of iterations to run. Higher iterations account for engine warm up and parsing. Default is 100000.
+ * @param {String} options.stat The statistical method to use when looking on the execution result. Can be either "median" or "average". Default is "median".
  */
 const bench = (cases, {
     iterations = DEFAULTS.iterations,
@@ -126,7 +128,10 @@ const bench = (cases, {
                 throw new Error(FAULTY_CASES_ERROR);
             }
 
-            const time = measureCase(caseFn, iterations)[stat];
+            const time = measureCase(caseFn, {
+                iterations,
+                stat
+            });
 
             return {
                 index: index + 1,
