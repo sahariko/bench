@@ -1,0 +1,24 @@
+{
+  "name": "@cocopina/bench",
+  "version": "0.0.1",
+  "description": "Run JS benchmarks with nanoseconds accuracy",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint ."
+  },
+  "keywords": [
+    "benchmark",
+    "performance",
+    "measurement"
+  ],
+  "author": "Sahar Brodbeker <saharonb@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^7.7.0",
+    "jest": "^26.4.2"
+  },
+  "dependencies": {
+    "colors": "^1.4.0"
+  }
+}
