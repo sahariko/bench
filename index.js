@@ -28,8 +28,7 @@ const measureCase = (fn, {
     iterations = DEFAULTS.iterations,
     stat = DEFAULTS.stat
 } = {}) => {
-    let total = BigInt(0);
-    let median;
+    const results = [];
     const medianIndex = Math.floor(iterations / 2);
 
     for (let i = 0; i < iterations; i++) {
@@ -38,15 +37,14 @@ const measureCase = (fn, {
         const end = process.hrtime.bigint();
         const time = end - start;
 
-        total += time;
-
-        if (i === medianIndex) {
-            median = time;
-            break;
-        }
+        results.push(time);
     }
 
-    return stat === STAT_METHODS.median ? median : bigintToNumber(total) / iterations;
+    results.sort((a, b) => a > b ? 1 : -1);
+
+    return stat === STAT_METHODS.median
+        ? results[medianIndex]
+        : bigintToNumber(results.reduce((total, result) => total + result), BigInt(0)) / iterations;
 };
 
 /**
